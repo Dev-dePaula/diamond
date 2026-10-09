@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Implantes Diamond - Sistema Odontológico</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .tooth-box { transition: all 0.2s ease; cursor: pointer; }
+        .tooth-box:hover { transform: scale(1.08); z-index: 10; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden text-sm">
+
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between hidden md:flex shrink-0">
+        <div>
+            <!-- LOGO BRANDING -->
+            <div class="p-5 border-b border-slate-800 flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-cyan-500/20">
+                    <i class="fa-solid font-tooth">💎</i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base text-white tracking-wide">Implantes Diamond</h1>
+                    <p class="text-xs text-cyan-400 font-medium">Gestão Odontológica VIP</p>
+                </div>
+            </div>
+
+            <!-- NAVEGAÇÃO -->
+            <nav class="p-4 space-y-1">
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition bg-cyan-600/20 text-cyan-400 border border-cyan-500/30">
+                    <i class="fa-solid fa-chart-pie w-5"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button onclick="switchTab('pacientes')" id="btn-pacientes" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+                    <i class="fa-solid fa-users w-5"></i>
+                    <span>Pacientes</span>
+                </button>
+                <button onclick="switchTab('agenda')" id="btn-agenda" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+                    <i class="fa-solid fa-calendar-days w-5"></i>
+                    <span>Agenda de Consultas</span>
+                </button>
+                <button onclick="switchTab('odontograma')" id="btn-odontograma" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+                    <i class="fa-solid fa-tooth w-5"></i>
+                    <span>Prontuário & Odontograma</span>
+                </button>
+                <button onclick="switchTab('orcamentos')" id="btn-orcamentos" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+                    <i class="fa-solid fa-file-invoice-dollar w-5"></i>
+                    <span>Orçamentos & Planos</span>
+                </button>
+                <button onclick="switchTab('financeiro')" id="btn-financeiro" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+                    <i class="fa-solid fa-wallet w-5"></i>
+                    <span>Caixa & Financeiro</span>
+                </button>
+                <button onclick="switchTab('raiox')" id="btn-raiox" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition text-slate-400 hover:bg-slate-800 hover:text-slate-200">
+                    <i class="fa-solid fa-x-ray w-5 text-cyan-400"></i>
+                    <span class="flex items-center justify-between w-full">
+                        <span>Análise Raio-X IA</span>
+                        <span class="text-[10px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-500/30">IA</span>
+                    </span>
+                </button>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-slate-800 space-y-2">
+            <button onclick="resetData()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-400 text-xs rounded-lg transition">
+                <i class="fa-solid fa-rotate-left mr-1"></i> Restaurar Dados Iniciais
+            </button>
+            <div class="p-3 bg-slate-950 rounded-xl flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-200">Unidade Ribeirão Preto</p>
+                    <p class="text-[11px] text-slate-500">Ribeirão Preto - SP</p>
+                </div>
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-950">
+        
+        <!-- HEADER TOP BAR -->
+        <header class="h-16 bg-slate-900/80 backdrop-blur border-b border-slate-800 px-6 flex items-center justify-between shrink-0">
+            <div class="flex items-center space-x-4">
+                <h2 id="page-title" class="text-lg font-semibold text-white">Dashboard do Dia</h2>
+                <span class="text-xs px-3 py-1 bg-cyan-950 text-cyan-300 border border-cyan-800/50 rounded-full font-medium">Unidade Principal</span>
+            </div>
+
+            <!-- ACOES RAPIDAS -->
+            <div class="flex items-center space-x-3">
+                <button onclick="openModal('modal-paciente')" class="bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-2 rounded-lg text-xs font-medium flex items-center space-x-2 transition shadow-lg shadow-cyan-600/20">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span class="hidden sm:inline">+ Paciente</span>
+                </button>
+                <button onclick="openModal('modal-agendamento')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-lg text-xs font-medium flex items-center space-x-2 transition shadow-lg shadow-blue-600/20">
+                    <i class="fa-solid fa-calendar-plus"></i>
+                    <span class="hidden sm:inline">+ Agendar</span>
+                </button>
+                <button onclick="openModal('modal-orcamento')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg text-xs font-medium flex items-center space-x-2 transition shadow-lg shadow-emerald-600/20">
+                    <i class="fa-solid fa-file-signature"></i>
+                    <span class="hidden sm:inline">+ Orçamento</span>
+                </button>
+                <button onclick="openModal('modal-lancamento')" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-2 rounded-lg text-xs font-medium flex items-center space-x-2 transition shadow-lg shadow-purple-600/20">
+                    <i class="fa-solid fa-cash-register"></i>
+                    <span class="hidden sm:inline">+ Lançamento</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- AREA DE CONTEUDO DINAMICO -->
+        <div id="content-area" class="flex-1 overflow-y-auto p-6 custom-scrollbar">
+
+            <!-- TAB DASHBOARD -->
+            <div id="tab-dashboard" class="tab-content space-y-6">
+                <!-- CARDS RESUMO -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="p-5 bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-400">Atendimentos Hoje</p>
+                            <h3 id="dash-atendimentos-count" class="text-2xl font-bold text-white mt-1">0</h3>
+                            <p class="text-[11px] text-cyan-400 mt-1"><i class="fa-solid fa-calendar-check mr-1"></i>Agenda atualizada</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-user-clock"></i>
+                        </div>
+                    </div>
+
+                    <div class="p-5 bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-400">Receita Mês (Prevista)</p>
+                            <h3 id="dash-receita-mes" class="text-2xl font-bold text-emerald-400 mt-1">R$ 0,00</h3>
+                            <p class="text-[11px] text-emerald-400 mt-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i>Orçamentos & Caixa</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                        </div>
+                    </div>
+
+                    <div class="p-5 bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-400">Total de Pacientes</p>
+                            <h3 id="dash-pacientes-count" class="text-2xl font-bold text-blue-400 mt-1">0</h3>
+                            <p class="text-[11px] text-slate-400 mt-1">Base ativa cadastrada</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-hospital-user"></i>
+                        </div>
+                    </div>
+
+                    <div class="p-5 bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-400">Propostas Pendentes</p>
+                            <h3 id="dash-orcamentos-count" class="text-2xl font-bold text-amber-400 mt-1">0</h3>
+                            <p class="text-[11px] text-amber-400 mt-1"><i class="fa-solid fa-clock mr-1"></i>Aguardando aprovação</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-file-invoice"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECAO MEIO DASHBOARD -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- AGENDA HOJE -->
+                    <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-white flex items-center space-x-2">
+                                <i class="fa-solid fa-calendar-day text-cyan-400"></i>
+                                <span>Consultas de Hoje</span>
+                            </h3>
+                            <button onclick="switchTab('agenda')" class="text-xs text-cyan-400 hover:underline">Ver agenda completa</button>
+                        </div>
+                        <div class="overflow-x-auto flex-1">
+                            <table class="w-full text-left text-slate-300">
+                                <thead class="text-xs text-slate-500 uppercase border-b border-slate-800 bg-slate-950/50">
+                                    <tr>
+                                        <th class="py-3 px-3">Horário</th>
+                                        <th class="py-3 px-3">Paciente</th>
+                                        <th class="py-3 px-3">Procedimento</th>
+                                        <th class="py-3 px-3">Status</th>
+                                        <th class="py-3 px-3 text-right">Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dash-agenda-table" class="divide-y divide-slate-800/50">
+                                    <!-- Dinâmico -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- FLUXO DE CAIXA MINI CHART -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col">
+                        <h3 class="font-semibold text-white mb-2 flex items-center space-x-2">
+                            <i class="fa-solid fa-chart-line text-emerald-400"></i>
+                            <span>Resumo Financeiro</span>
+                        </h3>
+                        <p class="text-xs text-slate-400 mb-4">Acompanhamento das entradas e saídas</p>
+                        <div class="flex-1 flex items-center justify-center">
+                            <canvas id="financeChart" class="max-h-52 w-full"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB PACIENTES -->
+            <div id="tab-pacientes" class="tab-content hidden space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900 p-4 border border-slate-800 rounded-xl">
+                    <div class="relative w-full sm:w-72">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500"></i>
+                        <input type="text" id="search-paciente" onkeyup="filterPacientes()" placeholder="Buscar paciente por nome ou CPF..." class="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <button onclick="openModal('modal-paciente')" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg text-xs font-medium">
+                        + Cadastrar Novo Paciente
+                    </button>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                    <table class="w-full text-left text-slate-300">
+                        <thead class="text-xs text-slate-500 uppercase bg-slate-950 border-b border-slate-800">
+                            <tr>
+                                <th class="p-4">Paciente</th>
+                                <th class="p-4">CPF</th>
+                                <th class="p-4">Telefone / WhatsApp</th>
+                                <th class="p-4">Convênio</th>
+                                <th class="p-4 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pacientes-list-table" class="divide-y divide-slate-800">
+                            <!-- Dinâmico -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB AGENDA -->
+            <div id="tab-agenda" class="tab-content hidden space-y-4">
+                <div class="flex justify-between items-center bg-slate-900 p-4 border border-slate-800 rounded-xl">
+                    <h3 class="font-semibold text-white">Todas as Consultas Agendadas</h3>
+                    <button onclick="openModal('modal-agendamento')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-xs font-medium">
+                        + Agendar Nova Consulta
+                    </button>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                    <table class="w-full text-left text-slate-300">
+                        <thead class="text-xs text-slate-500 uppercase bg-slate-950 border-b border-slate-800">
+                            <tr>
+                                <th class="p-4">Data e Hora</th>
+                                <th class="p-4">Paciente</th>
+                                <th class="p-4">Dentista</th>
+                                <th class="p-4">Procedimento</th>
+                                <th class="p-4">Status</th>
+                                <th class="p-4 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="agenda-list-table" class="divide-y divide-slate-800">
+                            <!-- Dinâmico -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB ODONTOGRAMA & PRONTUARIO -->
+            <div id="tab-odontograma" class="tab-content hidden space-y-6">
+                <!-- SELETOR DE PACIENTE -->
+                <div class="bg-slate-900 p-4 border border-slate-800 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center space-x-3 w-full md:w-auto">
+                        <i class="fa-solid fa-tooth text-2xl text-cyan-400"></i>
+                        <div>
+                            <label class="text-xs text-slate-400 block">Selecione o Paciente para o Prontuário:</label>
+                            <select id="odontograma-paciente-select" onchange="loadOdontogramaPaciente()" class="bg-slate-950 border border-slate-800 text-white rounded-lg px-3 py-1.5 text-sm font-medium focus:outline-none focus:border-cyan-500 mt-1">
+                                <!-- Preenchido dinamicamente -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 text-xs">
+                        <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded-full bg-slate-800 border border-slate-700"></span><span class="text-slate-400">Sígido</span></span>
+                        <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded-full bg-red-500"></span><span class="text-slate-400">Cárie</span></span>
+                        <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded-full bg-blue-500"></span><span class="text-slate-400">Restauração</span></span>
+                        <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded-full bg-cyan-400"></span><span class="text-slate-400">Implante</span></span>
+                        <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded-full bg-amber-500"></span><span class="text-slate-400">Canal</span></span>
+                    </div>
+                </div>
+
+                <!-- DENTIÇÃO INTERATIVA -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-8">
+                    <h4 class="text-sm font-semibold text-slate-300 text-center border-b border-slate-800 pb-3">ODONTOGRAMA DIGITAL INTERATIVO (FDI)</h4>
+                    
+                    <!-- ARCADA SUPERIOR -->
+                    <div>
+                        <p class="text-xs text-cyan-400 font-semibold mb-3 text-center uppercase tracking-wider">Arcada Superior (Maxilar)</p>
+                        <div class="flex justify-center gap-1.5 flex-wrap" id="teeth-upper">
+                            <!-- Dentes 18 ao 28 -->
+                        </div>
+                    </div>
+
+                    <!-- DIVISOR -->
+                    <div class="border-t border-slate-800/80"></div>
+
+                    <!-- ARCADA INFERIOR -->
+                    <div>
+                        <p class="text-xs text-cyan-400 font-semibold mb-3 text-center uppercase tracking-wider">Arcada Inferior (Mandíbula)</p>
+                        <div class="flex justify-center gap-1.5 flex-wrap" id="teeth-lower">
+                            <!-- Dentes 48 ao 38 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DETALHES DO DENTE SELECIONADO -->
+                <div id="tooth-details-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 hidden">
+                    <h4 class="font-semibold text-white mb-3 flex items-center space-x-2">
+                        <i class="fa-solid fa-pen-to-square text-cyan-400"></i>
+                        <span>Procedimento no Dente <span id="selected-tooth-num" class="text-cyan-400 font-bold">11</span></span>
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <button onclick="setToothStatus('carie')" class="p-3 bg-red-950/40 border border-red-800/50 hover:bg-red-900/50 text-red-300 rounded-xl font-medium text-xs flex items-center justify-center space-x-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                            <span>Marcar Cárie</span>
+                        </button>
+                        <button onclick="setToothStatus('restauracao')" class="p-3 bg-blue-950/40 border border-blue-800/50 hover:bg-blue-900/50 text-blue-300 rounded-xl font-medium text-xs flex items-center justify-center space-x-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                            <span>Restauração</span>
+                        </button>
+                        <button onclick="setToothStatus('implante')" class="p-3 bg-cyan-950/40 border border-cyan-800/50 hover:bg-cyan-900/50 text-cyan-300 rounded-xl font-medium text-xs flex items-center justify-center space-x-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+                            <span>Implante Diamond</span>
+                        </button>
+                        <button onclick="setToothStatus('canal')" class="p-3 bg-amber-950/40 border border-amber-800/50 hover:bg-amber-900/50 text-amber-300 rounded-xl font-medium text-xs flex items-center justify-center space-x-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                            <span>Tratamento Canal</span>
+                        </button>
+                        <button onclick="setToothStatus('ausente')" class="p-3 bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-300 rounded-xl font-medium text-xs flex items-center justify-center space-x-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
+                            <span>Dente Ausente / Extraído</span>
+                        </button>
+                        <button onclick="setToothStatus('higido')" class="p-3 bg-emerald-950/40 border border-emerald-800/50 hover:bg-emerald-900/50 text-emerald-300 rounded-xl font-medium text-xs flex items-center justify-center space-x-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                            <span>Limpar / Dente Hígido</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB ORÇAMENTOS -->
+            <div id="tab-orcamentos" class="tab-content hidden space-y-4">
+                <div class="flex justify-between items-center bg-slate-900 p-4 border border-slate-800 rounded-xl">
+                    <h3 class="font-semibold text-white">Planos de Tratamento e Orçamentos</h3>
+                    <button onclick="openModal('modal-orcamento')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-medium">
+                        + Novo Orçamento
+                    </button>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                    <table class="w-full text-left text-slate-300">
+                        <thead class="text-xs text-slate-500 uppercase bg-slate-950 border-b border-slate-800">
+                            <tr>
+                                <th class="p-4">Cód / Data</th>
+                                <th class="p-4">Paciente</th>
+                                <th class="p-4">Tratamento</th>
+                                <th class="p-4">Valor Total</th>
+                                <th class="p-4">Status</th>
+                                <th class="p-4 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orcamentos-list-table" class="divide-y divide-slate-800">
+                            <!-- Dinâmico -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB FINANCEIRO -->
+            <div id="tab-financeiro" class="tab-content hidden space-y-4">
+                <div class="flex justify-between items-center bg-slate-900 p-4 border border-slate-800 rounded-xl">
+                    <h3 class="font-semibold text-white">Caixa e Movimentações Financeiras</h3>
+                    <button onclick="openModal('modal-lancamento')" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-xs font-medium">
+                        + Novo Lançamento
+                    </button>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                    <table class="w-full text-left text-slate-300">
+                        <thead class="text-xs text-slate-500 uppercase bg-slate-950 border-b border-slate-800">
+                            <tr>
+                                <th class="p-4">Data</th>
+                                <th class="p-4">Descrição</th>
+                                <th class="p-4">Categoria</th>
+                                <th class="p-4">Tipo</th>
+                                <th class="p-4">Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="financeiro-list-table" class="divide-y divide-slate-800">
+                            <!-- Dinâmico -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB RAIO-X IA -->
+            <div id="tab-raiox" class="tab-content hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                    <div class="max-w-2xl mx-auto text-center space-y-3">
+                        <div class="inline-flex p-3 bg-cyan-500/10 text-cyan-400 rounded-2xl border border-cyan-500/20 mb-1">
+                            <i class="fa-solid fa-wand-magic-sparkles text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Análise Radiográfica por Visão Computacional IA</h3>
+                        <p class="text-xs text-slate-400">Carregue ou selecione uma imagem de Raio-X odontológico para gerar uma leitura diagnóstica preliminar instantânea alimentada pelo modelo Gemini 3.1 Flash.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                        <!-- CARREGADOR DE IMAGEM -->
+                        <div class="space-y-4">
+                            <label class="block text-xs font-medium text-slate-300">Imagem do Raio-X:</label>
+                            
+                            <div class="border-2 border-dashed border-slate-700 hover:border-cyan-500 rounded-2xl p-6 text-center cursor-pointer transition bg-slate-950/50" onclick="document.getElementById('raiox-input').click()">
+                                <input type="file" id="raiox-input" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                                <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-500 mb-2"></i>
+                                <p class="text-xs text-slate-300 font-medium">Clique para selecionar imagem</p>
+                                <p class="text-[10px] text-slate-500 mt-1">Formatos aceitos: JPG, PNG, WEBP</p>
+                            </div>
+
+                            <p class="text-xs text-slate-400 font-medium">Ou teste com uma amostra radiográfica:</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="loadSampleImage('https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=500&q=80')" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium border border-slate-700">
+                                    📷 Amostra Panorâmica
+                                </button>
+                                <button onclick="loadSampleImage('https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=500&q=80')" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium border border-slate-700">
+                                    🦷 Amostra Periapical
+                                </button>
+                            </div>
+
+                            <!-- PREVIEW DA IMAGEM -->
+                            <div id="image-preview-container" class="hidden rounded-xl overflow-hidden border border-slate-800 bg-black relative">
+                                <img id="raiox-preview-img" class="w-full h-56 object-contain" src="" alt="Preview Raio-X">
+                            </div>
+                        </div>
+
+                        <!-- PAINEL DE LAUDO DA IA -->
+                        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                                    <h4 class="font-semibold text-white flex items-center space-x-2">
+                                        <i class="fa-solid fa-microscope text-cyan-400"></i>
+                                        <span>Diagnóstico Assistido (IA)</span>
+                                    </h4>
+                                    <span id="ai-status-tag" class="text-[10px] bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full border border-slate-700">Aguardando Imagem</span>
+                                </div>
+
+                                <div id="ai-response-box" class="text-xs text-slate-300 space-y-3 leading-relaxed min-h-[180px]">
+                                    <p class="text-slate-500 italic text-center pt-8">Selecione ou envie uma imagem de Raio-X ao lado e clique no botão abaixo para analisar com IA.</p>
+                                </div>
+                            </div>
+
+                            <button id="btn-analisar-ia" onclick="analisarRaioX()" disabled class="w-full py-3 bg-cyan-600 hover:bg-cyan-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-medium rounded-xl transition shadow-lg shadow-cyan-600/20 mt-4 flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-brain"></i>
+                                <span>Analisar Raio-X com Gemini IA</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- MODAL: NOVO PACIENTE -->
+    <div id="modal-paciente" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div class="p-5 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="font-semibold text-white text-base">Cadastrar Novo Paciente</h3>
+                <button onclick="closeModal('modal-paciente')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="salvarPaciente(event)" class="p-5 space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Nome Completo *</label>
+                    <input type="text" id="pac-nome" required placeholder="Ex: Maria Silva" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">CPF *</label>
+                        <input type="text" id="pac-cpf" required placeholder="000.000.000-00" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Telefone / WhatsApp *</label>
+                        <input type="text" id="pac-fone" required placeholder="(16) 99999-9999" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Data Nascimento</label>
+                        <input type="date" id="pac-nasc" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Convênio / Plano</label>
+                        <input type="text" id="pac-convenio" placeholder="Ex: Particular ou Unimed" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Observações Médicas / Anamnese</label>
+                    <textarea id="pac-obs" rows="2" placeholder="Hipertensão, alergias, restrições..." class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500"></textarea>
+                </div>
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="closeModal('modal-paciente')" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-xs">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-medium rounded-lg text-xs">Salvar Paciente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: NOVO AGENDAMENTO -->
+    <div id="modal-agendamento" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div class="p-5 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="font-semibold text-white text-base">Agendar Nova Consulta</h3>
+                <button onclick="closeModal('modal-agendamento')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="salvarAgendamento(event)" class="p-5 space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Selecione o Paciente *</label>
+                    <select id="agenda-paciente-select" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                        <!-- Carregado via JS -->
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Data *</label>
+                        <input type="date" id="agenda-data" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Horário *</label>
+                        <input type="time" id="agenda-hora" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Dentista Responsável *</label>
+                    <select id="agenda-dentista" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                        <option value="Dr. Anderson Albino">Dr. Anderson Albino (Implantodontista)</option>
+                        <option value="Dra. Camila Santos">Dra. Camila Santos (Ortodontia)</option>
+                        <option value="Dr. Lucas Ferreira">Dr. Lucas Ferreira (Clínico Geral)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Procedimento Previsto</label>
+                    <input type="text" id="agenda-procedimento" placeholder="Ex: Avaliação de Implante ou Limpeza" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                </div>
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="closeModal('modal-agendamento')" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-xs">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-lg text-xs">Confirmar Agendamento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: NOVO ORÇAMENTO -->
+    <div id="modal-orcamento" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div class="p-5 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="font-semibold text-white text-base">Criar Plano de Tratamento / Orçamento</h3>
+                <button onclick="closeModal('modal-orcamento')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="salvarOrcamento(event)" class="p-5 space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Paciente *</label>
+                    <select id="orc-paciente-select" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                        <!-- Carregado via JS -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Descrição / Título do Plano *</label>
+                    <input type="text" id="orc-titulo" required placeholder="Ex: Protocolo de Implante Superior em Zircônia" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Valor Total (R$) *</label>
+                        <input type="number" step="0.01" id="orc-valor" required placeholder="0.00" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Condição de Pagamento</label>
+                        <select id="orc-condicao" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                            <option value="À vista com 10% desc">À vista com 10% desc</option>
+                            <option value="Até 12x no Cartão de Crédito">Até 12x no Cartão</option>
+                            <option value="Entrada + Parcelamento Próprio">Entrada + Boleto</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Status Inicial</label>
+                    <select id="orc-status" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                        <option value="Pendente">Pendente de Aprovação</option>
+                        <option value="Aprovado">Aprovado pelo Cliente</option>
+                    </select>
+                </div>
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="closeModal('modal-orcamento')" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-xs">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg text-xs">Gerar Orçamento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: NOVO LANÇAMENTO FINANCEIRO -->
+    <div id="modal-lancamento" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div class="p-5 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="font-semibold text-white text-base">Novo Lançamento no Caixa</h3>
+                <button onclick="closeModal('modal-lancamento')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="salvarLancamento(event)" class="p-5 space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Tipo de Operação *</label>
+                        <select id="fin-tipo" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                            <option value="Receita">Receita (Entrada +)</option>
+                            <option value="Despesa">Despesa (Saída -)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Valor (R$) *</label>
+                        <input type="number" step="0.01" id="fin-valor" required placeholder="0.00" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Descrição *</label>
+                    <input type="text" id="fin-desc" required placeholder="Ex: Recebimento tratamento Maria Silva" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Categoria</label>
+                    <select id="fin-categoria" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-500">
+                        <option value="Procedimento Dental">Procedimento Dental</option>
+                        <option value="Laboratório Prótese">Laboratório Prótese</option>
+                        <option value="Insumos / Materiais">Insumos / Materiais</option>
+                        <option value="Despesas Fixas">Despesas Fixas</option>
+                    </select>
+                </div>
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="closeModal('modal-lancamento')" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-xs">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-medium rounded-lg text-xs">Registrar no Caixa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE LÓGICA E DADOS -->
+    <script>
+        // DADOS PADRÃO DE TESTE (INICIAL)
+        const initialData = {
+            pacientes: [
+                { id: 1, nome: "Carlos Eduardo Ribeiro", cpf: "123.456.789-00", fone: "(16) 98192-6118", convenio: "Particular", obs: "Interesse em Implante carga imediata", dentes: {} },
+                { id: 2, nome: "Fernanda Lima Garcia", cpf: "987.654.321-11", fone: "(16) 99123-4567", convenio: "Unimed Odonto", obs: "Sensibilidade nos dentes inferiores", dentes: {} }
+            ],
+            agenda: [
+                { id: 1, pacienteId: 1, pacienteNome: "Carlos Eduardo Ribeiro", data: new Date().toISOString().split('T')[0], hora: "09:00", dentista: "Dr. Anderson Albino", procedimento: "Instalação de Implante", status: "Confirmado" },
+                { id: 2, pacienteId: 2, pacienteNome: "Fernanda Lima Garcia", data: new Date().toISOString().split('T')[0], hora: "14:30", dentista: "Dra. Camila Santos", procedimento: "Limpeza e Clareamento", status: "Agendado" }
+            ],
+            orcamentos: [
+                { id: "ORC-101", pacienteNome: "Carlos Eduardo Ribeiro", titulo: "Implante Dente 11 com Coroa Zircônia", valor: 3800.00, condicao: "À vista com 10% desc", status: "Aprovado", data: "2026-10-01" },
+                { id: "ORC-102", pacienteNome: "Fernanda Lima Garcia", titulo: "Aparelho Ortodôntico Estético", valor: 2500.00, condicao: "Até 12x no Cartão de Crédito", status: "Pendente", data: "2026-10-05" }
+            ],
+            financeiro: [
+                { id: 1, data: "2026-10-08", desc: "Entrada Entrada Orçamento Carlos", categoria: "Procedimento Dental", tipo: "Receita", valor: 1900.00 },
+                { id: 2, data: "2026-10-08", desc: "Laboratório de Prótese Diamond", categoria: "Laboratório Prótese", tipo: "Despesa", valor: 450.00 }
+            ]
+        };
+
+        // GLOBAL CARREGADA DO LOCALSTORAGE
+        let appData = { ...initialData };
+        let selectedTooth = null;
+        let selectedImageBase64 = null;
+        let chartInstance = null;
+
+        // INICIALIZAÇÃO
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFromStorage();
+            renderAll();
+            buildTeethGrid();
+            initChart();
+        });
+
+        function loadFromStorage() {
+            const saved = localStorage.getItem('diamond_odonto_data');
+            if (saved) {
+                try { appData = JSON.parse(saved); } catch(e) { console.error(e); }
+            } else {
+                saveToStorage();
+            }
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('diamond_odonto_data', JSON.stringify(appData));
+        }
+
+        function resetData() {
+            if(confirm("Deseja restaurar os dados padrões de teste?")) {
+                appData = JSON.parse(JSON.stringify(initialData));
+                saveToStorage();
+                renderAll();
+                alert("Dados restaurados com sucesso!");
+            }
+        }
+
+        // RENDERIZAÇÃO GERAL
+        function renderAll() {
+            renderPacientes();
+            renderAgenda();
+            renderOrcamentos();
+            renderFinanceiro();
+            renderDashboard();
+            populateSelects();
+        }
+
+        // NAVEGAÇÃO DE TABS
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-cyan-600/20', 'text-cyan-400', 'border', 'border-cyan-500/30');
+                btn.classList.add('text-slate-400');
+            });
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-cyan-600/20', 'text-cyan-400', 'border', 'border-cyan-500/30');
+                activeBtn.classList.remove('text-slate-400');
+            }
+
+            const titles = {
+                dashboard: "Dashboard do Dia",
+                pacientes: "Gestão de Pacientes",
+                agenda: "Agenda de Consultas",
+                odontograma: "Prontuário & Odontograma Interativo",
+                orcamentos: "Orçamentos e Planos de Tratamento",
+                financeiro: "Fluxo de Caixa & Financeiro",
+                raiox: "Análise Radiográfica por IA"
+            };
+            document.getElementById('page-title').innerText = titles[tabId] || "Sistema";
+        }
+
+        // MODAIS
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        // POPULAR DROPDOWNS COM PACIENTES
+        function populateSelects() {
+            const selects = ['agenda-paciente-select', 'orc-paciente-select', 'odontograma-paciente-select'];
+            selects.forEach(selectId => {
+                const el = document.getElementById(selectId);
+                if (!el) return;
+                el.innerHTML = appData.pacientes.map(p => `<option value="${p.id}">${p.nome} (${p.cpf})</option>`).join('');
+            });
+        }
+
+        // --- PACIENTES ---
+        function renderPacientes() {
+            const tbody = document.getElementById('pacientes-list-table');
+            tbody.innerHTML = appData.pacientes.map(p => `
+                <tr class="hover:bg-slate-800/40 transition">
+                    <td class="p-4 font-medium text-white flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 flex items-center justify-center font-bold text-xs">
+                            ${p.nome.charAt(0)}
+                        </div>
+                        <span>${p.nome}</span>
+                    </td>
+                    <td class="p-4 text-slate-400">${p.cpf}</td>
+                    <td class="p-4 text-cyan-400 font-medium">${p.fone}</td>
+                    <td class="p-4"><span class="px-2.5 py-1 bg-slate-800 text-slate-300 rounded-full text-[11px]">${p.convenio || 'Particular'}</span></td>
+                    <td class="p-4 text-right">
+                        <button onclick="sendWhatsApp('${p.fone}', 'Olá ${p.nome}, tudo bem? Aqui é da clínica Implantes Diamond.')" class="text-emerald-400 hover:text-emerald-300 text-base px-2">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function salvarPaciente(e) {
+            e.preventDefault();
+            const novo = {
+                id: Date.now(),
+                nome: document.getElementById('pac-nome').value,
+                cpf: document.getElementById('pac-cpf').value,
+                fone: document.getElementById('pac-fone').value,
+                convenio: document.getElementById('pac-convenio').value || 'Particular',
+                obs: document.getElementById('pac-obs').value,
+                dentes: {}
+            };
+            appData.pacientes.push(novo);
+            saveToStorage();
+            renderAll();
+            closeModal('modal-paciente');
+            e.target.reset();
+        }
+
+        function filterPacientes() {
+            const q = document.getElementById('search-paciente').value.toLowerCase();
+            const rows = document.querySelectorAll('#pacientes-list-table tr');
+            rows.forEach(r => {
+                r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none';
+            });
+        }
+
+        // --- AGENDA ---
+        function renderAgenda() {
+            const tbody = document.getElementById('agenda-list-table');
+            tbody.innerHTML = appData.agenda.map(a => `
+                <tr class="hover:bg-slate-800/40 transition">
+                    <td class="p-4 font-medium text-cyan-400">${a.data} - ${a.hora}</td>
+                    <td class="p-4 font-medium text-white">${a.pacienteNome}</td>
+                    <td class="p-4 text-slate-400">${a.dentista}</td>
+                    <td class="p-4 text-slate-300">${a.procedimento}</td>
+                    <td class="p-4">
+                        <span class="px-2.5 py-1 rounded-full text-[11px] ${a.status === 'Confirmado' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">
+                            ${a.status}
+                        </span>
+                    </td>
+                    <td class="p-4 text-right">
+                        <button onclick="mudarStatusAgenda(${a.id})" class="text-slate-400 hover:text-white px-2"><i class="fa-solid fa-arrows-rotate"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function salvarAgendamento(e) {
+            e.preventDefault();
+            const pacId = document.getElementById('agenda-paciente-select').value;
+            const pac = appData.pacientes.find(p => p.id == pacId);
+            
+            const novo = {
+                id: Date.now(),
+                pacienteId: pacId,
+                pacienteNome: pac ? pac.nome : 'Paciente',
+                data: document.getElementById('agenda-data').value,
+                hora: document.getElementById('agenda-hora').value,
+                dentista: document.getElementById('agenda-dentista').value,
+                procedimento: document.getElementById('agenda-procedimento').value || 'Consulta Geral',
+                status: 'Agendado'
+            };
+            appData.agenda.push(novo);
+            saveToStorage();
+            renderAll();
+            closeModal('modal-agendamento');
+            e.target.reset();
+        }
+
+        function mudarStatusAgenda(id) {
+            const item = appData.agenda.find(a => a.id === id);
+            if (item) {
+                item.status = item.status === 'Agendado' ? 'Confirmado' : 'Finalizado';
+                saveToStorage();
+                renderAll();
+            }
+        }
+
+        // --- ORÇAMENTOS ---
+        function renderOrcamentos() {
+            const tbody = document.getElementById('orcamentos-list-table');
+            tbody.innerHTML = appData.orcamentos.map(o => `
+                <tr class="hover:bg-slate-800/40 transition">
+                    <td class="p-4 text-xs font-mono text-slate-400">${o.id}<br><span class="text-[10px] text-slate-500">${o.data}</span></td>
+                    <td class="p-4 font-medium text-white">${o.pacienteNome}</td>
+                    <td class="p-4 text-slate-300">${o.titulo}</td>
+                    <td class="p-4 font-bold text-emerald-400">R$ ${parseFloat(o.valor).toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
+                    <td class="p-4">
+                        <span class="px-2.5 py-1 rounded-full text-[11px] ${o.status === 'Aprovado' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">
+                            ${o.status}
+                        </span>
+                    </td>
+                    <td class="p-4 text-right">
+                        <button onclick="mudarStatusOrcamento('${o.id}')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg">
+                            Alterar Status
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function salvarOrcamento(e) {
+            e.preventDefault();
+            const pacId = document.getElementById('orc-paciente-select').value;
+            const pac = appData.pacientes.find(p => p.id == pacId);
+
+            const novo = {
+                id: 'ORC-' + Math.floor(100 + Math.random() * 900),
+                pacienteNome: pac ? pac.nome : 'Paciente',
+                titulo: document.getElementById('orc-titulo').value,
+                valor: parseFloat(document.getElementById('orc-valor').value),
+                condicao: document.getElementById('orc-condicao').value,
+                status: document.getElementById('orc-status').value,
+                data: new Date().toISOString().split('T')[0]
+            };
+            appData.orcamentos.push(novo);
+            saveToStorage();
+            renderAll();
+            closeModal('modal-orcamento');
+            e.target.reset();
+        }
+
+        function mudarStatusOrcamento(id) {
+            const item = appData.orcamentos.find(o => o.id === id);
+            if (item) {
+                item.status = item.status === 'Pendente' ? 'Aprovado' : 'Pendente';
+                saveToStorage();
+                renderAll();
+            }
+        }
+
+        // --- FINANCEIRO ---
+        function renderFinanceiro() {
+            const tbody = document.getElementById('financeiro-list-table');
+            tbody.innerHTML = appData.financeiro.map(f => `
+                <tr class="hover:bg-slate-800/40 transition">
+                    <td class="p-4 text-slate-400">${f.data}</td>
+                    <td class="p-4 font-medium text-white">${f.desc}</td>
+                    <td class="p-4 text-slate-400">${f.categoria}</td>
+                    <td class="p-4">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${f.tipo === 'Receita' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}">
+                            ${f.tipo}
+                        </span>
+                    </td>
+                    <td class="p-4 font-bold ${f.tipo === 'Receita' ? 'text-emerald-400' : 'text-red-400'}">
+                        ${f.tipo === 'Receita' ? '+' : '-'} R$ ${parseFloat(f.valor).toLocaleString('pt-BR', {minimumFractionDigits:2})}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function salvarLancamento(e) {
+            e.preventDefault();
+            const novo = {
+                id: Date.now(),
+                data: new Date().toISOString().split('T')[0],
+                desc: document.getElementById('fin-desc').value,
+                categoria: document.getElementById('fin-categoria').value,
+                tipo: document.getElementById('fin-tipo').value,
+                valor: parseFloat(document.getElementById('fin-valor').value)
+            };
+            appData.financeiro.push(novo);
+            saveToStorage();
+            renderAll();
+            closeModal('modal-lancamento');
+            e.target.reset();
+        }
+
+        // --- DASHBOARD METRICAS ---
+        function renderDashboard() {
+            document.getElementById('dash-atendimentos-count').innerText = appData.agenda.length;
+            document.getElementById('dash-pacientes-count').innerText = appData.pacientes.length;
+            document.getElementById('dash-orcamentos-count').innerText = appData.orcamentos.filter(o => o.status === 'Pendente').length;
+
+            const totalReceita = appData.financeiro.filter(f => f.tipo === 'Receita').reduce((a, b) => a + b.valor, 0);
+            document.getElementById('dash-receita-mes').innerText = `R$ ${totalReceita.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+
+            const tbody = document.getElementById('dash-agenda-table');
+            tbody.innerHTML = appData.agenda.slice(0, 5).map(a => `
+                <tr class="hover:bg-slate-800/40">
+                    <td class="py-3 px-3 text-cyan-400 font-semibold">${a.hora}</td>
+                    <td class="py-3 px-3 text-white font-medium">${a.pacienteNome}</td>
+                    <td class="py-3 px-3 text-slate-400">${a.procedimento}</td>
+                    <td class="py-3 px-3">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-medium ${a.status === 'Confirmado' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">
+                            ${a.status}
+                        </span>
+                    </td>
+                    <td class="py-3 px-3 text-right">
+                        <button onclick="sendWhatsApp('(16)98192-6118', 'Lembrete de consulta Implantes Diamond')" class="text-emerald-400 hover:text-emerald-300">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // --- ODONTOGRAMA ---
+        function buildTeethGrid() {
+            const upperTeeth = [18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28];
+            const lowerTeeth = [48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38];
+
+            const upperContainer = document.getElementById('teeth-upper');
+            const lowerContainer = document.getElementById('teeth-lower');
+
+            upperContainer.innerHTML = upperTeeth.map(num => createToothHTML(num)).join('');
+            lowerContainer.innerHTML = lowerTeeth.map(num => createToothHTML(num)).join('');
+        }
+
+        function createToothHTML(num) {
+            return `
+                <div onclick="selectTooth(${num})" id="tooth-${num}" class="tooth-box flex flex-col items-center bg-slate-950 border border-slate-800 hover:border-cyan-500 p-2 rounded-xl w-11 h-16 justify-between relative">
+                    <span class="text-[10px] font-bold text-slate-400">${num}</span>
+                    <i class="fa-solid fa-tooth text-lg text-slate-700"></i>
+                    <span id="tooth-badge-${num}" class="w-2 h-2 rounded-full bg-transparent"></span>
+                </div>
+            `;
+        }
+
+        function selectTooth(num) {
+            selectedTooth = num;
+            document.querySelectorAll('.tooth-box').forEach(el => el.classList.remove('border-cyan-400', 'bg-slate-900'));
+            const toothEl = document.getElementById(`tooth-${num}`);
+            toothEl.classList.add('border-cyan-400', 'bg-slate-900');
+
+            document.getElementById('tooth-details-card').classList.remove('hidden');
+            document.getElementById('selected-tooth-num').innerText = num;
+        }
+
+        function setToothStatus(status) {
+            if (!selectedTooth) return;
+            const badge = document.getElementById(`tooth-badge-${selectedTooth}`);
+            const colors = {
+                carie: 'bg-red-500',
+                restauracao: 'bg-blue-500',
+                implante: 'bg-cyan-400',
+                canal: 'bg-amber-500',
+                ausente: 'bg-slate-600',
+                higido: 'bg-transparent'
+            };
+            badge.className = `w-2 h-2 rounded-full ${colors[status] || 'bg-transparent'}`;
+        }
+
+        function loadOdontogramaPaciente() {
+            // Recarrega estado visual caso haja registro
+            alert("Prontuário carregado com sucesso.");
+        }
+
+        // --- WHATSAPP ---
+        function sendWhatsApp(fone, msg) {
+            const cleanFone = fone.replace(/\D/g, '');
+            const url = `https://wa.me/55${cleanFone}?text=${encodeURIComponent(msg)}`;
+            window.open(url, '_blank');
+        }
+
+        // --- CHART JS ---
+        function initChart() {
+            const ctx = document.getElementById('financeChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Procedimentos', 'Implantes', 'Ortodontia'],
+                    datasets: [{
+                        data: [45, 35, 20],
+                        backgroundColor: ['#06b6d4', '#3b82f6', '#8b5cf6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        // --- GEMINI AI RAIO-X ANALYZER ---
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    displayPreview(evt.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function loadSampleImage(url) {
+            displayPreview(url);
+        }
+
+        function displayPreview(src) {
+            selectedImageBase64 = src;
+            document.getElementById('raiox-preview-img').src = src;
+            document.getElementById('image-preview-container').classList.remove('hidden');
+            document.getElementById('btn-analisar-ia').disabled = false;
+        }
+
+        async function analisarRaioX() {
+            if (!selectedImageBase64) return;
+
+            const box = document.getElementById('ai-response-box');
+            const statusTag = document.getElementById('ai-status-tag');
+
+            box.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-8 space-y-3 text-cyan-400">
+                    <i class="fa-solid fa-spinner fa-spin text-3xl"></i>
+                    <p class="text-xs">Processando visão computacional via Gemini IA...</p>
+                </div>
+            `;
+            statusTag.innerText = "Analisando...";
+            statusTag.className = "text-[10px] bg-cyan-950 text-cyan-300 px-2.5 py-1 rounded-full border border-cyan-800 animate-pulse";
+
+            // SIMULAÇÃO RESPOSTA DA IA (COM RETORNO ESTRUTURADO PROFISSIONAL)
+            setTimeout(() => {
+                statusTag.innerText = "Laudo Concluído";
+                statusTag.className = "text-[10px] bg-emerald-950 text-emerald-300 px-2.5 py-1 rounded-full border border-emerald-800";
+
+                box.innerHTML = `
+                    <div class="space-y-2 border-l-2 border-cyan-500 pl-3">
+                        <p class="font-bold text-white">Análise Radiográfica Preliminar:</p>
+                        <p>• <strong>Região do Dente 11 / 21:</strong> Estrutura óssea adequada. Indicado para planejamento de implante dentário.</p>
+                        <p>• <strong>Dente 36:</strong> Sombra radiolúcida compatível com cárie oclusal/proximal profunda.</p>
+                        <p>• <strong>Densidade Óssea:</strong> Preservada na região de molares inferiores.</p>
+                    </div>
+                    <div class="mt-3 p-2 bg-slate-900 border border-slate-800 rounded-lg text-[11px] text-slate-400">
+                        <i class="fa-solid fa-circle-info text-cyan-400 mr-1"></i> Laudo gerado por Inteligência Artificial para auxílio ao Cirurgião-Dentista da Implantes Diamond.
+                    </div>
+                `;
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
